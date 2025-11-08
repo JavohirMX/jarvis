@@ -59,7 +59,18 @@ jobs:
             
             # Wait for services to be healthy
             echo "⏳ Waiting for services to be ready..."
-            sleep 15
+            sleep 30
+            
+            # Wait for web service to be healthy
+            echo "⏳ Waiting for web service to start..."
+            for i in {1..30}; do
+              if docker-compose ps web | grep -q "healthy"; then
+                echo "✅ Web service is healthy"
+                break
+              fi
+              echo "Waiting... ($i/30)"
+              sleep 2
+            done
             
             # Check container status
             echo "📊 Container status:"
@@ -78,11 +89,28 @@ jobs:
           DROPLET_USER: ${{ secrets.DROPLET_USER }}
         run: |
           echo "🏥 Running health check..."
-          sleep 10
+          echo "⏳ Waiting for application to be fully ready..."
+          sleep 20
+          
           ssh ${DROPLET_USER}@${DROPLET_HOST} << 'ENDSSH'
-            curl -f http://localhost:8080/admin/login/ || exit 1
+            # Wait for application to respond
+            for i in {1..20}; do
+              if curl -f http://localhost:8080/admin/login/ > /dev/null 2>&1; then
+                echo "✅ Health check passed!"
+                exit 0
+              fi
+              echo "Attempt $i/20: Application not ready yet, waiting..."
+              sleep 3
+            done
+            
+            # If we get here, health check failed
+            echo "❌ Health check failed after 60 seconds"
+            echo "Container status:"
+            docker-compose ps
+            echo "Recent logs:"
+            docker-compose logs --tail=100 web
+            exit 1
           ENDSSH
-          echo "✅ Health check passed!"
 
       - name: Notify Success
         if: success()

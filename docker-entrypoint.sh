@@ -5,15 +5,46 @@ echo "Starting Django application..."
 
 # Wait for PostgreSQL to be ready
 echo "Waiting for PostgreSQL..."
-while ! nc -z ${DB_HOST:-db} ${DB_PORT:-5432}; do
-  sleep 0.5
+until python << END
+import sys
+import psycopg2
+try:
+    conn = psycopg2.connect(
+        dbname="${DB_NAME:-ai_assistant}",
+        user="${DB_USER:-ai_assistant_user}",
+        password="${DB_PASSWORD}",
+        host="${DB_HOST:-db}",
+        port="${DB_PORT:-5432}"
+    )
+    conn.close()
+except psycopg2.OperationalError:
+    sys.exit(1)
+END
+do
+  echo "PostgreSQL is unavailable - waiting..."
+  sleep 1
 done
 echo "PostgreSQL is ready!"
 
 # Wait for Redis to be ready
 echo "Waiting for Redis..."
-while ! nc -z ${REDIS_HOST:-redis} ${REDIS_PORT:-6379}; do
-  sleep 0.5
+until python << END
+import sys
+import redis
+try:
+    r = redis.Redis(
+        host="${REDIS_HOST:-redis}",
+        port=int("${REDIS_PORT:-6379}"),
+        password="${REDIS_PASSWORD}",
+        socket_connect_timeout=2
+    )
+    r.ping()
+except (redis.ConnectionError, redis.TimeoutError):
+    sys.exit(1)
+END
+do
+  echo "Redis is unavailable - waiting..."
+  sleep 1
 done
 echo "Redis is ready!"
 
