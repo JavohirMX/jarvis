@@ -1,10 +1,11 @@
 """
 Custom WebSocket origin validator to support desktop/mobile app protocols
 """
-from channels.security.websocket import OriginValidator
+from channels.middleware import BaseMiddleware
+from django.conf import settings
 
 
-class CustomOriginValidator(OriginValidator):
+class CustomOriginValidator(BaseMiddleware):
     """
     Custom origin validator that allows:
     - Standard HTTP/HTTPS origins (via ALLOWED_HOSTS)
@@ -22,21 +23,43 @@ class CustomOriginValidator(OriginValidator):
         Validate the origin header.
         
         Returns True if:
+        - Origin is None (some clients don't send origin)
         - Origin scheme is in allowed_schemes (file://, app://)
-        - Origin is in ALLOWED_HOSTS (standard HTTP/HTTPS)
+        - Origin matches ALLOWED_HOSTS (standard HTTP/HTTPS)
         """
         if origin is None:
             return True
         
-        # Parse the origin
+        # Handle special schemes
+        for scheme in self.allowed_schemes:
+            if origin.startswith(f"{scheme}://"):
+                return True
+        
+        # Validate HTTP/HTTPS origins against ALLOWED_HOSTS
         try:
-            # Handle special schemes
-            for scheme in self.allowed_schemes:
-                if origin.startswith(f"{scheme}://"):
+            from urllib.parse import urlparse
+            parsed = urlparse(origin)
+            
+            # Get the host from the origin
+            host = parsed.hostname
+            if parsed.port:
+                host = f"{host}:{parsed.port}"
+            
+            # Check against ALLOWED_HOSTS
+            allowed_hosts = settings.ALLOWED_HOSTS
+            if '*' in allowed_hosts:
+                return True
+            
+            # Check if host matches any allowed host
+            for allowed_host in allowed_hosts:
+                if allowed_host.startswith('.'):
+                    # Wildcard subdomain match
+                    if host.endswith(allowed_host) or host == allowed_host[1:]:
+                        return True
+                elif host == allowed_host:
                     return True
             
-            # Fall back to standard validation for HTTP/HTTPS
-            return super().validate_origin(origin)
+            return False
         except Exception:
             return False
     
@@ -63,5 +86,5 @@ class CustomOriginValidator(OriginValidator):
             return
         
         # Origin is valid, continue to application
-        return await self.application(scope, receive, send)
+        return await super().__call__(scope, receive, send)
 
