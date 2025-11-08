@@ -117,7 +117,7 @@ USE_MINIO=True
 MINIO_ENDPOINT=http://localhost:9000
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=ai-assistant-media
+MINIO_BUCKET_NAME=jarvis-media
 
 # Test MinIO connectivity
 python manage.py test_minio
