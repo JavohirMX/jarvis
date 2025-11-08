@@ -40,7 +40,6 @@ db.sqlite3-journal
 
 # Node/NPM
 node_modules/
-package-lock.json
 
 # Environment variables
 .env
