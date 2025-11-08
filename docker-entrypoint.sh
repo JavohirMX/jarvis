@@ -48,6 +48,73 @@ do
 done
 echo "Redis is ready!"
 
+# Wait for MinIO to be ready (if enabled)
+if [ "${USE_MINIO}" = "True" ]; then
+  echo "Waiting for MinIO..."
+  MINIO_HOST=$(echo ${MINIO_ENDPOINT} | sed 's~http[s]*://~~' | cut -d: -f1)
+  MINIO_PORT=$(echo ${MINIO_ENDPOINT} | sed 's~http[s]*://~~' | cut -d: -f2)
+  MINIO_PORT=${MINIO_PORT:-9000}
+  
+  until curl -f "http://${MINIO_HOST}:${MINIO_PORT}/minio/health/live" > /dev/null 2>&1; do
+    echo "MinIO is unavailable - waiting..."
+    sleep 2
+  done
+  echo "MinIO is ready!"
+  
+  # Create MinIO bucket if it doesn't exist
+  echo "Setting up MinIO bucket..."
+  python manage.py shell << END
+import boto3
+from botocore.exceptions import ClientError
+import os
+
+endpoint = os.getenv('MINIO_ENDPOINT', 'http://minio:9000')
+access_key = os.getenv('MINIO_ACCESS_KEY', 'minioadmin')
+secret_key = os.getenv('MINIO_SECRET_KEY', 'minioadmin')
+bucket_name = os.getenv('MINIO_BUCKET_NAME', 'jarvis-media')
+
+try:
+    s3_client = boto3.client(
+        's3',
+        endpoint_url=endpoint,
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        region_name='us-east-1',
+        verify=False
+    )
+    
+    # Check if bucket exists
+    try:
+        s3_client.head_bucket(Bucket=bucket_name)
+        print(f"✓ Bucket '{bucket_name}' already exists")
+    except ClientError:
+        # Bucket doesn't exist, create it
+        s3_client.create_bucket(Bucket=bucket_name)
+        print(f"✓ Created bucket '{bucket_name}'")
+        
+        # Set bucket policy for public read access to avatars
+        bucket_policy = {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {"AWS": "*"},
+                    "Action": ["s3:GetObject"],
+                    "Resource": [f"arn:aws:s3:::{bucket_name}/avatars/*", f"arn:aws:s3:::{bucket_name}/chat_images/*"]
+                }
+            ]
+        }
+        
+        import json
+        s3_client.put_bucket_policy(Bucket=bucket_name, Policy=json.dumps(bucket_policy))
+        print(f"✓ Set public read policy for avatars and chat_images")
+        
+except Exception as e:
+    print(f"⚠ MinIO setup warning: {e}")
+    print("You may need to create the bucket manually")
+END
+fi
+
 # Run database migrations
 echo "Running database migrations..."
 python manage.py migrate --noinput
