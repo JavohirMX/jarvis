@@ -282,30 +282,28 @@ CORS_ALLOW_HEADERS = [
     'ngrok-skip-browser-warning',  # Add this line
 ]
 # Channels Configuration
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD', '')
 
 if REDIS_PASSWORD:
-    # Production: Redis with password
+    # Production: Redis with password (use URL format)
+    REDIS_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [
-                    {
-                        'address': (os.getenv('REDIS_HOST', 'localhost'), int(os.getenv('REDIS_PORT', '6379'))),
-                        'password': REDIS_PASSWORD,
-                    }
-                ],
+                'hosts': [REDIS_URL],
             },
         },
     }
 else:
-    # Development: Redis without password
+    # Development: Redis without password (use tuple format)
     CHANNEL_LAYERS = {
         'default': {
             'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-                'hosts': [(os.getenv('REDIS_HOST', 'localhost'), int(os.getenv('REDIS_PORT', '6379')))],
+                'hosts': [(REDIS_HOST, int(REDIS_PORT))],
             },
         },
     }
