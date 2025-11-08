@@ -34,9 +34,11 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Copy static files and build CSS
+# Copy ALL files needed for Tailwind to scan
 COPY static ./static
 COPY tailwind.config.js ./
+COPY landing ./landing
+# Tailwind needs to scan templates to find which classes are used
 RUN npm run build:css
 
 # Stage 3: Final production image
