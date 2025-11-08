@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-slate-900 text-white;
+  }
+  
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  * {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-jarvis-pink to-jarvis-purple bg-clip-text text-transparent;
+  }
+  
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(90deg, #ec4899, #d946ef);
+    border-radius: 0.5rem;
+    padding: 2px;
+  }
+  
+  .gradient-border-content {
+    @apply bg-slate-900 rounded-lg;
+  }
+  
+  .btn-primary {
+    @apply px-8 py-4 bg-gradient-to-r from-jarvis-pink to-jarvis-purple text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply px-8 py-4 bg-slate-800 text-white font-semibold rounded-lg border border-slate-700 hover:border-jarvis-purple transition-all duration-300;
+  }
+  
+  .card {
+    @apply bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700/50 hover:border-jarvis-purple/50 transition-all duration-300;
+  }
+  
+  .section-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20;
+  }
+  
+  .platform-tab {
+    @apply flex items-center px-6 py-3 text-slate-400 rounded-lg transition-all duration-300 cursor-pointer font-medium;
+  }
+  
+  .platform-tab:hover {
+    @apply text-slate-200;
+  }
+  
+  .platform-tab.active {
+    @apply bg-gradient-to-r from-jarvis-pink to-jarvis-purple text-white;
+  }
+  
+  .download-card {
+    @apply hidden;
+  }
+  
+  .download-card.active {
+    @apply block;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .glow {
+    box-shadow: 0 0 30px rgba(217, 70, 239, 0.4), 0 0 60px rgba(217, 70, 239, 0.2);
+  }
+  
+  .glow-purple {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
+  }
+  
+  .glow-pink {
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4), 0 0 60px rgba(236, 72, 153, 0.2);
+  }
+}
+

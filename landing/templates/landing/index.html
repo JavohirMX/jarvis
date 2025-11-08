@@ -1,0 +1,619 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-jarvis-purple/30 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-jarvis-pink/30 rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 right-1/3 w-64 h-64 bg-jarvis-glow/20 rounded-full blur-3xl animate-float" style="animation-delay: 4s;"></div>
+    </div>
+    
+    <div class="relative section-container text-center">
+        <div class="max-w-4xl mx-auto">
+            <!-- Badge -->
+            <div class="inline-flex items-center space-x-2 bg-slate-800/50 backdrop-blur-sm px-4 py-2 rounded-full border border-jarvis-purple/30 mb-8 animate-fade-in">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-jarvis-purple opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-jarvis-purple"></span>
+                </span>
+                <span class="text-sm text-slate-300">Powered by OpenAI, Anthropic & Google</span>
+            </div>
+            
+            <!-- Main Heading -->
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-slide-up">
+                Your <span class="gradient-text">AI-Powered</span><br/>
+                Desktop Assistant
+            </h1>
+            
+            <!-- Subheading -->
+            <p class="text-xl md:text-2xl text-slate-300 mb-12 animate-slide-up" style="animation-delay: 0.2s;">
+                Boost productivity with real-time AI assistance, voice commands,<br class="hidden md:block"/>
+                and intelligent context-aware help right on your desktop.
+            </p>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-up" style="animation-delay: 0.4s;">
+                <button id="download-cta" class="btn-primary">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span id="download-text">Download for Windows</span>
+                    </span>
+                </button>
+                <a href="/api/docs/" class="btn-secondary">
+                    View Documentation
+                </a>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto animate-fade-in" style="animation-delay: 0.6s;">
+                <div>
+                    <div class="text-3xl font-bold gradient-text mb-1">3</div>
+                    <div class="text-sm text-slate-400">AI Providers</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold gradient-text mb-1">24/7</div>
+                    <div class="text-sm text-slate-400">Always Ready</div>
+                </div>
+                <div>
+                    <div class="text-3xl font-bold gradient-text mb-1">100%</div>
+                    <div class="text-sm text-slate-400">Private & Secure</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="section-container bg-slate-900/50">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Powerful <span class="gradient-text">Features</span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+            Everything you need to supercharge your productivity with AI assistance
+        </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1: Multi-AI Provider -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Multiple AI Providers</h3>
+            <p class="text-slate-400">
+                Choose from OpenAI GPT-4, Anthropic Claude, or Google Gemini for your AI interactions.
+            </p>
+        </div>
+        
+        <!-- Feature 2: Voice Commands -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Voice Commands</h3>
+            <p class="text-slate-400">
+                Control Jarvis with your voice using advanced speech-to-text and text-to-speech capabilities.
+            </p>
+        </div>
+        
+        <!-- Feature 3: Smart Context Detection -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Smart Context Detection</h3>
+            <p class="text-slate-400">
+                Jarvis understands your workflow and provides intelligent, context-aware suggestions in real-time.
+            </p>
+        </div>
+        
+        <!-- Feature 4: Real-time Responses -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Real-time Streaming</h3>
+            <p class="text-slate-400">
+                Get instant AI responses with WebSocket-powered real-time streaming for a smooth experience.
+            </p>
+        </div>
+        
+        <!-- Feature 5: Token Management -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Usage Tracking</h3>
+            <p class="text-slate-400">
+                Track your AI usage with detailed analytics and manage token quotas efficiently.
+            </p>
+        </div>
+        
+        <!-- Feature 6: Cross-Platform -->
+        <div class="card group hover:scale-105 transform transition-all duration-300">
+            <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-lg flex items-center justify-center mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold mb-2">Cross-Platform</h3>
+            <p class="text-slate-400">
+                Available on Windows, macOS, and Linux. Use Jarvis wherever you work.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Demo/Showcase Section -->
+<section class="section-container">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            See It <span class="gradient-text">In Action</span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+            Experience the power of AI assistance integrated seamlessly into your workflow
+        </p>
+    </div>
+    
+    <div class="max-w-5xl mx-auto">
+        <!-- Demo Card -->
+        <div class="card p-8">
+            <div class="aspect-video bg-slate-900 rounded-lg flex items-center justify-center border border-slate-700 relative overflow-hidden">
+                <!-- Placeholder for demo/screenshot -->
+                <div class="text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-2xl flex items-center justify-center">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <p class="text-slate-400">Interactive Demo Coming Soon</p>
+                    <p class="text-sm text-slate-500 mt-2">
+                        Watch Jarvis assist with code explanation, text summarization, and more
+                    </p>
+                </div>
+                
+                <!-- Decorative elements -->
+                <div class="absolute top-4 right-4 flex space-x-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+            </div>
+            
+            <!-- Feature Highlights -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-jarvis-purple/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-jarvis-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-1">Natural Conversations</h4>
+                    <p class="text-sm text-slate-400">Chat naturally with AI</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-jarvis-pink/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-jarvis-pink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-1">Context-Aware</h4>
+                    <p class="text-sm text-slate-400">Understands your workflow</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 mx-auto mb-2 bg-jarvis-purple/20 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-jarvis-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h4 class="font-semibold mb-1">Lightning Fast</h4>
+                    <p class="text-sm text-slate-400">Real-time responses</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Download Section -->
+<section id="download" class="section-container bg-slate-900/50">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Download <span class="gradient-text">Jarvis</span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+            Choose your platform and start boosting your productivity today
+        </p>
+    </div>
+    
+    <div class="max-w-4xl mx-auto">
+        <!-- Platform Selector Tabs -->
+        <div class="flex justify-center mb-12">
+            <div class="inline-flex bg-slate-800/50 rounded-xl p-1 backdrop-blur-sm border border-slate-700/50">
+                <button class="platform-tab active" data-platform="windows">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                    </svg>
+                    <span>Windows</span>
+                </button>
+                <button class="platform-tab" data-platform="macos">
+                    <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    </svg>
+                    <span>macOS</span>
+                </button>
+                <button class="platform-tab" data-platform="linux">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Linux</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Download Card -->
+        <div class="max-w-2xl mx-auto" id="download-cards">
+            <!-- Windows Card -->
+            <div class="download-card active" data-platform="windows">
+                <div class="card p-8">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="text-2xl font-bold mb-1">Jarvis for Windows</h3>
+                                <p class="text-sm text-slate-400">Windows 10 & 11 (64-bit)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-full mb-3 text-lg py-4">
+                        <span class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Download Installer (.exe)</span>
+                        </span>
+                    </button>
+                    <div class="flex items-center justify-between text-sm text-slate-500">
+                        <span>Version 1.0.0</span>
+                        <span>•</span>
+                        <span>85 MB</span>
+                        <span>•</span>
+                        <span>Released Nov 2025</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- macOS Card -->
+            <div class="download-card" data-platform="macos">
+                <div class="card p-8">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-10 h-10 text-white" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="text-2xl font-bold mb-1">Jarvis for macOS</h3>
+                                <p class="text-sm text-slate-400">macOS 11+ (Intel & Apple Silicon)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-full mb-3 text-lg py-4">
+                        <span class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Download Disk Image (.dmg)</span>
+                        </span>
+                    </button>
+                    <div class="flex items-center justify-between text-sm text-slate-500">
+                        <span>Version 1.0.0</span>
+                        <span>•</span>
+                        <span>92 MB</span>
+                        <span>•</span>
+                        <span>Released Nov 2025</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Linux Card -->
+            <div class="download-card" data-platform="linux">
+                <div class="card p-8">
+                    <div class="flex items-start justify-between mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <h3 class="text-2xl font-bold mb-1">Jarvis for Linux</h3>
+                                <p class="text-sm text-slate-400">Ubuntu 20.04+ / Debian 11+</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary w-full mb-3 text-lg py-4">
+                        <span class="flex items-center justify-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Download AppImage (.appimage)</span>
+                        </span>
+                    </button>
+                    <div class="flex items-center justify-between text-sm text-slate-500">
+                        <span>Version 1.0.0</span>
+                        <span>•</span>
+                        <span>88 MB</span>
+                        <span>•</span>
+                        <span>Released Nov 2025</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Requirements -->
+        <div class="mt-12 p-6 bg-slate-800/30 rounded-lg border border-slate-700/50">
+            <h4 class="font-semibold mb-4 text-center">System Requirements</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div>
+                    <p class="text-slate-400 mb-1">Processor:</p>
+                    <p class="text-white">x64 processor</p>
+                </div>
+                <div>
+                    <p class="text-slate-400 mb-1">Memory:</p>
+                    <p class="text-white">4 GB RAM (8 GB recommended)</p>
+                </div>
+                <div>
+                    <p class="text-slate-400 mb-1">Storage:</p>
+                    <p class="text-white">200 MB available space</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section-container">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            What Users <span class="gradient-text">Say</span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+            Join thousands of productive users worldwide
+        </p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <!-- Testimonial 1 -->
+        <div class="card">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-semibold">Alex Chen</h4>
+                    <p class="text-sm text-slate-400">Software Developer</p>
+                </div>
+            </div>
+            <p class="text-slate-300">
+                "Jarvis has completely transformed my workflow. The real-time AI assistance is a game-changer for code documentation!"
+            </p>
+            <div class="flex mt-4 text-jarvis-purple">
+                ★★★★★
+            </div>
+        </div>
+        
+        <!-- Testimonial 2 -->
+        <div class="card">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-semibold">Sarah Johnson</h4>
+                    <p class="text-sm text-slate-400">Content Creator</p>
+                </div>
+            </div>
+            <p class="text-slate-300">
+                "The voice commands make it so easy to get AI assistance without interrupting my creative flow. Absolutely love it!"
+            </p>
+            <div class="flex mt-4 text-jarvis-purple">
+                ★★★★★
+            </div>
+        </div>
+        
+        <!-- Testimonial 3 -->
+        <div class="card">
+            <div class="flex items-center mb-4">
+                <div class="w-12 h-12 bg-gradient-to-r from-jarvis-pink to-jarvis-purple rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h4 class="font-semibold">Dr. Michael Park</h4>
+                    <p class="text-sm text-slate-400">Researcher</p>
+                </div>
+            </div>
+            <p class="text-slate-300">
+                "Having multiple AI providers in one app is fantastic. I can compare responses and get the best results for my research."
+            </p>
+            <div class="flex mt-4 text-jarvis-purple">
+                ★★★★★
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+        <div class="text-center">
+            <div class="text-4xl font-bold gradient-text mb-2">10K+</div>
+            <p class="text-slate-400">Downloads</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl font-bold gradient-text mb-2">5K+</div>
+            <p class="text-slate-400">Active Users</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl font-bold gradient-text mb-2">1M+</div>
+            <p class="text-slate-400">AI Interactions</p>
+        </div>
+        <div class="text-center">
+            <div class="text-4xl font-bold gradient-text mb-2">4.9</div>
+            <p class="text-slate-400">User Rating</p>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="section-container bg-slate-900/50">
+    <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">
+            Frequently Asked <span class="gradient-text">Questions</span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-2xl mx-auto">
+            Everything you need to know about Jarvis
+        </p>
+    </div>
+    
+    <div class="max-w-3xl mx-auto space-y-4">
+        <!-- FAQ Item 1 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Is Jarvis free to use?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Jarvis is open-source and free to use. However, you'll need your own API keys for the AI providers (OpenAI, Anthropic, or Gemini) to use the AI features. We offer generous free tier quotas to get you started.</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Item 2 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Which AI providers are supported?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Jarvis currently supports OpenAI (GPT-4), Anthropic (Claude), and Google (Gemini). You can switch between providers seamlessly or use multiple providers simultaneously.</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Item 3 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Is my data secure?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Yes! All your data is stored locally on your device. API communications are encrypted, and we never store or transmit your personal data to our servers. Your API keys are securely stored in your local configuration.</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Item 4 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">What are the system requirements?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Jarvis requires a 64-bit processor, 4GB RAM (8GB recommended), and 200MB of storage space. It's compatible with Windows 10/11, macOS 11+, and major Linux distributions like Ubuntu 20.04+.</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Item 5 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">How do I get started?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Simply download Jarvis for your platform, install it, and configure your AI provider API keys in the settings. Check out our documentation for detailed setup instructions and best practices.</p>
+            </div>
+        </div>
+        
+        <!-- FAQ Item 6 -->
+        <div class="faq-item card cursor-pointer">
+            <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Can I contribute to the project?</h3>
+                <svg class="w-6 h-6 transform transition-transform faq-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+            <div class="faq-content hidden mt-4 text-slate-300">
+                <p>Absolutely! Jarvis is open-source and we welcome contributions. Check out our GitHub repository for contribution guidelines, open issues, and development roadmap.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section-container">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="card p-12 bg-gradient-to-r from-jarvis-pink/10 to-jarvis-purple/10 border-jarvis-purple/30">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                Ready to boost your <span class="gradient-text">productivity</span>?
+            </h2>
+            <p class="text-xl text-slate-300 mb-8">
+                Download Jarvis today and experience the future of AI-powered desktop assistance
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button id="final-download-cta" class="btn-primary">
+                    <span class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        <span>Download Now</span>
+                    </span>
+                </button>
+                <a href="/api/docs/" class="btn-secondary">
+                    Read Documentation
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
