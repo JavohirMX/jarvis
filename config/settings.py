@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'channels',
     'drf_spectacular',
     'storages',  # django-storages for MinIO/S3
+    'landing',
     'authentication',
     'profiles',
     'token_usage',
@@ -154,6 +155,10 @@ APPEND_SLASH=False
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
@@ -230,7 +235,26 @@ SIMPLE_JWT = {
 # CORS Configuration for Desktop App
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8080').split(',')
 CORS_ALLOW_CREDENTIALS = True
-
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'ngrok-skip-browser-warning',  # Add this line
+]
 # Channels Configuration
 CHANNEL_LAYERS = {
     'default': {
