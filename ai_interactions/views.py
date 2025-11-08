@@ -613,3 +613,94 @@ class AIExplainCodeView(APIView):
                 {'error': f'Code explanation failed: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'image': {
+                    'type': 'string',
+                    'format': 'binary',
+                    'description': 'Image file to upload for chat message',
+                }
+            },
+            'required': ['image']
+        }
+    },
+    responses={
+        200: inline_serializer(
+            name='UploadImageResponse',
+            fields={
+                'image_url': serializers.URLField(),
+                'filename': serializers.CharField(),
+                'size': serializers.IntegerField(),
+                'mime_type': serializers.CharField(),
+            }
+        )
+    },
+    summary="Upload chat image",
+    description="Upload image for chat message (to be sent via WebSocket). Returns MinIO URL."
+)
+class UploadChatImageView(APIView):
+    """
+    Upload image for chat message
+    Returns MinIO URL to be sent via WebSocket
+    
+    POST /api/ai/upload-image/
+    """
+    permission_classes = (IsAuthenticated,)
+    
+    def post(self, request):
+        image_file = request.FILES.get('image')
+        
+        if not image_file:
+            return Response(
+                {'error': 'No image provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate image type
+        valid_types = [
+            'image/png', 'image/jpeg', 'image/jpg',
+            'image/webp', 'image/heic', 'image/heif'
+        ]
+        if image_file.content_type not in valid_types:
+            return Response(
+                {'error': 'Invalid image format. Allowed: PNG, JPEG, WebP, HEIC, HEIF'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate size (max 50MB)
+        max_size = 50 * 1024 * 1024
+        if image_file.size > max_size:
+            return Response(
+                {'error': 'Image too large. Maximum size: 50MB'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            from django.core.files.storage import default_storage
+            import uuid
+            
+            # Generate unique filename
+            ext = image_file.name.split('.')[-1] if '.' in image_file.name else 'jpg'
+            filename = f"chat_images/user_{request.user.id}/{uuid.uuid4()}.{ext}"
+            
+            # Save to storage (MinIO or local)
+            saved_path = default_storage.save(filename, image_file)
+            image_url = default_storage.url(saved_path)
+            
+            return Response({
+                'image_url': image_url,
+                'filename': saved_path,
+                'size': image_file.size,
+                'mime_type': image_file.content_type,
+            })
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Upload failed: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

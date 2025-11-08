@@ -11,6 +11,9 @@ urlpatterns = [
     path('translate/', views.AITranslateView.as_view(), name='ai-translate'),
     path('explain-code/', views.AIExplainCodeView.as_view(), name='ai-explain-code'),
     
+    # Image upload for chat (WebSocket)
+    path('upload-image/', views.UploadChatImageView.as_view(), name='upload-chat-image'),
+    
     # Conversation management
     path('conversations/', views.ConversationListView.as_view(), name='conversation-list'),
     path('conversations/<int:pk>/', views.ConversationDetailView.as_view(), name='conversation-detail'),

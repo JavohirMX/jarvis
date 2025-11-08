@@ -100,6 +100,8 @@ class AIAssistantConsumer(AsyncWebsocketConsumer):
         conversation_id = data.get('data', {}).get('conversation_id')
         context = data.get('data', {}).get('context', {})
         provider = data.get('data', {}).get('provider')  # Optional provider override
+        image_url = data.get('data', {}).get('image_url')  # Image uploaded via HTTP
+        image_data = data.get('data', {}).get('image_data')  # Base64 image (alternative)
         
         if not message:
             await self.send(text_data=json.dumps({
@@ -134,8 +136,8 @@ class AIAssistantConsumer(AsyncWebsocketConsumer):
                 title = message[:50] + ('...' if len(message) > 50 else '')
                 conversation = await self.create_conversation(title)
             
-            # Save user message
-            user_message = await self.save_user_message(conversation, message, context)
+            # Save user message (with optional image)
+            user_message = await self.save_user_message(conversation, message, context, image_url)
             
             # Get conversation history
             history = await self.get_conversation_history(conversation)
@@ -304,10 +306,10 @@ class AIAssistantConsumer(AsyncWebsocketConsumer):
         return Conversation.objects.create(user=self.user, title=title)
     
     @database_sync_to_async
-    def save_user_message(self, conversation, message, context):
+    def save_user_message(self, conversation, message, context, image_url=None):
         """Save user message to database"""
         from ai_interactions.models import AIMessage
-        return AIMessage.objects.create(
+        msg = AIMessage.objects.create(
             conversation=conversation,
             role='user',
             content=message,
@@ -317,6 +319,13 @@ class AIAssistantConsumer(AsyncWebsocketConsumer):
             completion_tokens=0,
             total_tokens=0
         )
+        
+        # If image_url is provided, store it
+        if image_url:
+            msg.image_url = image_url
+            msg.save(update_fields=['image_url'])
+        
+        return msg
     
     @database_sync_to_async
     def save_ai_response(self, conversation, content, model, prompt_tokens, completion_tokens, total_tokens):
