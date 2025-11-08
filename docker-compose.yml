@@ -126,8 +126,8 @@ services:
       DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
       DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-}
     volumes:
-      - static_volume:/app/staticfiles
-      - media_volume:/app/media
+      - ./staticfiles:/app/staticfiles
+      - ./media:/app/media
     ports:
       - "8080:8080"
     networks:
@@ -238,6 +238,4 @@ volumes:
   postgres_data:
   redis_data:
   minio_data:
-  static_volume:
-  media_volume:
 
