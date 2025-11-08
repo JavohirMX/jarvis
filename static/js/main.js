@@ -193,17 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cards.forEach(card => {
         observer.observe(card);
     });
-    
-    // Add subtle parallax effect to hero background
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset;
-        const parallaxElements = document.querySelectorAll('.animate-float');
-        
-        parallaxElements.forEach((element, index) => {
-            const speed = 0.5 + (index * 0.1);
-            element.style.transform = `translateY(${scrolled * speed}px)`;
-        });
-    });
 });
 
 // Add download click handlers for platform cards
