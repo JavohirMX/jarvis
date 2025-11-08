@@ -54,9 +54,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Create app user
+# Create app user (use UID 1000 to match host user)
 RUN useradd -m -u 1000 appuser && \
-    mkdir -p /app /app/staticfiles /app/media && \
+    mkdir -p /app && \
     chown -R appuser:appuser /app
 
 # Copy virtual environment from builder
