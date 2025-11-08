@@ -1,0 +1,97 @@
+name: Deploy to DigitalOcean
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        env:
+          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DROPLET_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to Droplet
+        env:
+          DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        run: |
+          ssh ${DROPLET_USER}@${DROPLET_HOST} << 'ENDSSH'
+            set -e
+            
+            echo "🚀 Starting deployment..."
+            
+            # Navigate to project directory
+            cd /home/jmx/jarvis
+            
+            # Pull latest changes
+            echo "📥 Pulling latest code from GitHub..."
+            git fetch origin
+            git reset --hard origin/main
+            
+            # Make entrypoint executable
+            chmod +x docker-entrypoint.sh
+            
+            # Stop containers gracefully
+            echo "🛑 Stopping containers..."
+            docker-compose down || true
+            
+            # Build new images
+            echo "🏗️ Building Docker images..."
+            docker-compose build --no-cache web
+            
+            # Start containers
+            echo "🚢 Starting containers..."
+            docker-compose up -d
+            
+            # Wait for services to be healthy
+            echo "⏳ Waiting for services to be ready..."
+            sleep 15
+            
+            # Check container status
+            echo "📊 Container status:"
+            docker-compose ps
+            
+            # Clean up old images
+            echo "🧹 Cleaning up old Docker images..."
+            docker image prune -f
+            
+            echo "✅ Deployment completed successfully!"
+          ENDSSH
+
+      - name: Health Check
+        env:
+          DROPLET_HOST: ${{ secrets.DROPLET_HOST }}
+          DROPLET_USER: ${{ secrets.DROPLET_USER }}
+        run: |
+          echo "🏥 Running health check..."
+          sleep 10
+          ssh ${DROPLET_USER}@${DROPLET_HOST} << 'ENDSSH'
+            curl -f http://localhost:8080/admin/login/ || exit 1
+          ENDSSH
+          echo "✅ Health check passed!"
+
+      - name: Notify Success
+        if: success()
+        run: |
+          echo "✅ Deployment to jarvis.javohirmx.com completed successfully!"
+
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed! Check logs for details."
+          exit 1
+
