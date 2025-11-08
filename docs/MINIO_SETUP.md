@@ -29,7 +29,7 @@ USE_MINIO=True
 MINIO_ENDPOINT=http://localhost:9000
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=ai-assistant-media
+MINIO_BUCKET_NAME=jarvis-media
 MINIO_USE_SSL=False
 MINIO_REGION=us-east-1
 
@@ -45,7 +45,7 @@ MINIO_REGION=us-east-1
 | `MINIO_ENDPOINT` | MinIO server URL | `http://localhost:9000` | Yes |
 | `MINIO_ACCESS_KEY` | MinIO access key | `minioadmin` | Yes |
 | `MINIO_SECRET_KEY` | MinIO secret key | `minioadmin` | Yes |
-| `MINIO_BUCKET_NAME` | Bucket name for media files | `ai-assistant-media` | Yes |
+| `MINIO_BUCKET_NAME` | Bucket name for media files | `jarvis-media` | Yes |
 | `MINIO_USE_SSL` | Use SSL/TLS connection | `False` | No |
 | `MINIO_REGION` | AWS region (for compatibility) | `us-east-1` | No |
 | `MINIO_CUSTOM_DOMAIN` | Custom CDN domain | None | No |
@@ -120,7 +120,7 @@ After starting MinIO:
 1. Open the MinIO Console: http://localhost:9001
 2. Login with your credentials (default: minioadmin/minioadmin)
 3. Click "Buckets" → "Create Bucket"
-4. Name it `ai-assistant-media` (or your configured bucket name)
+4. Name it `jarvis-media` (or your configured bucket name)
 5. Set the bucket policy to "public" if you want avatars to be publicly accessible
 
 ### Using MinIO Client (mc)
@@ -134,10 +134,10 @@ chmod +x mc
 ./mc alias set myminio http://localhost:9000 minioadmin minioadmin
 
 # Create bucket
-./mc mb myminio/ai-assistant-media
+./mc mb myminio/jarvis-media
 
 # Set public read policy for avatars
-./mc anonymous set download myminio/ai-assistant-media/avatars
+./mc anonymous set download myminio/jarvis-media/avatars
 ```
 
 ## Testing the Configuration
@@ -165,7 +165,7 @@ profile.avatar.save("test_avatar.jpg", test_file)
 
 # Check the URL
 print(profile.avatar.url)
-# Should show MinIO URL like: http://localhost:9000/ai-assistant-media/avatars/test_avatar.jpg
+# Should show MinIO URL like: http://localhost:9000/jarvis-media/avatars/test_avatar.jpg
 ```
 
 ## API Usage
@@ -194,7 +194,7 @@ Response:
     "username": "testuser",
     "email": "test@example.com"
   },
-  "avatar": "http://localhost:9000/ai-assistant-media/avatars/user_1/avatar_abc123.jpg",
+  "avatar": "http://localhost:9000/jarvis-media/avatars/user_1/avatar_abc123.jpg",
   ...
 }
 ```
@@ -273,7 +273,7 @@ print(s3.list_buckets())
 Create the bucket manually or programmatically:
 
 ```python
-s3.create_bucket(Bucket='ai-assistant-media')
+s3.create_bucket(Bucket='jarvis-media')
 ```
 
 ### Permission Denied

@@ -172,7 +172,7 @@ if USE_MINIO:
     MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'http://localhost:9000')
     MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'minioadmin')
     MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'minioadmin')
-    MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'ai-assistant-media')
+    MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'jarvis-media')
     MINIO_USE_SSL = os.getenv('MINIO_USE_SSL', 'False') == 'True'
     MINIO_REGION = os.getenv('MINIO_REGION', 'us-east-1')
     
@@ -192,14 +192,34 @@ if USE_MINIO:
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_FILE_OVERWRITE = False
     
-    # Use MinIO for default file storage
-    DEFAULT_FILE_STORAGE = 'config.storages.MinIOMediaStorage'
+    # Use MinIO for default file storage (Django 5.2+ uses STORAGES dict)
+    DEFAULT_FILE_STORAGE = 'config.storages.MinIOMediaStorage'  # Backwards compatibility
+    
+    # Django 4.2+ STORAGES configuration
+    STORAGES = {
+        "default": {
+            "BACKEND": "config.storages.MinIOMediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
     
     # Update MEDIA_URL for MinIO
     if MINIO_CUSTOM_DOMAIN:
         MEDIA_URL = f'https://{MINIO_CUSTOM_DOMAIN}/{MINIO_BUCKET_NAME}/'
     else:
         MEDIA_URL = f'{MINIO_ENDPOINT}/{MINIO_BUCKET_NAME}/'
+else:
+    # Local file storage when MinIO is disabled
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

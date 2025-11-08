@@ -40,7 +40,7 @@ if USE_MINIO:
     MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'http://localhost:9000')
     MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY', 'minioadmin')
     MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY', 'minioadmin')
-    MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'ai-assistant-media')
+    MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME', 'jarvis-media')
     MINIO_USE_SSL = os.getenv('MINIO_USE_SSL', 'False') == 'True'
     MINIO_REGION = os.getenv('MINIO_REGION', 'us-east-1')
     
@@ -152,7 +152,7 @@ USE_MINIO=True
 MINIO_ENDPOINT=http://localhost:9000
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=ai-assistant-media
+MINIO_BUCKET_NAME=jarvis-media
 MINIO_USE_SSL=False
 MINIO_REGION=us-east-1
 
@@ -189,7 +189,7 @@ USE_MINIO=True
 MINIO_ENDPOINT=http://localhost:9000
 MINIO_ACCESS_KEY=minioadmin
 MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=ai-assistant-media
+MINIO_BUCKET_NAME=jarvis-media
 ```
 
 ### 4. Test MinIO
@@ -200,13 +200,13 @@ python manage.py test_minio
 
 ### 5. Create Bucket (if needed)
 
-Access MinIO Console at http://localhost:9001 and create bucket `ai-assistant-media`.
+Access MinIO Console at http://localhost:9001 and create bucket `jarvis-media`.
 
 Or use MinIO client:
 ```bash
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
-mc mb myminio/ai-assistant-media
-mc anonymous set download myminio/ai-assistant-media/avatars
+mc mb myminio/jarvis-media
+mc anonymous set download myminio/jarvis-media/avatars
 ```
 
 ## API Usage
@@ -229,7 +229,7 @@ curl -X GET http://localhost:8000/api/profile/me/ \
 Response includes avatar URL:
 ```json
 {
-  "avatar": "http://localhost:9000/ai-assistant-media/avatars/user_1_avatar_abc123.jpg",
+  "avatar": "http://localhost:9000/jarvis-media/avatars/user_1_avatar_abc123.jpg",
   ...
 }
 ```
@@ -238,7 +238,7 @@ Response includes avatar URL:
 
 ### With MinIO Enabled (`USE_MINIO=True`)
 - Avatar files uploaded to MinIO bucket
-- URL: `http://localhost:9000/ai-assistant-media/avatars/filename.jpg`
+- URL: `http://localhost:9000/jarvis-media/avatars/filename.jpg`
 - Files accessible via MinIO endpoint
 - Scalable and production-ready
 

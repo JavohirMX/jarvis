@@ -56,7 +56,7 @@ curl -X PATCH http://localhost:8000/api/profile/me/ \
     "username": "johndoe",
     "email": "john@example.com"
   },
-  "avatar": "http://localhost:9000/ai-assistant-media/avatars/user_1_avatar_abc123.jpg",
+  "avatar": "http://localhost:9000/jarvis-media/avatars/user_1_avatar_abc123.jpg",
   "theme": "dark",
   "notifications_enabled": true,
   ...
@@ -86,7 +86,7 @@ curl -X GET http://localhost:8000/api/profile/me/ \
     "username": "johndoe",
     "email": "john@example.com"
   },
-  "avatar": "http://localhost:9000/ai-assistant-media/avatars/user_1_avatar_abc123.jpg",
+  "avatar": "http://localhost:9000/jarvis-media/avatars/user_1_avatar_abc123.jpg",
   "theme": "dark",
   "ai_response_length": "medium",
   "notifications_enabled": true,
