@@ -10,7 +10,6 @@ https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
 import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
@@ -22,10 +21,11 @@ django_asgi_app = get_asgi_application()
 # Import websocket routing after django setup
 from realtime import routing as websocket_routing
 from realtime.middleware import JWTAuthMiddleware
+from realtime.origin_validator import CustomOriginValidator
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,
-    "websocket": AllowedHostsOriginValidator(
+    "websocket": CustomOriginValidator(
         JWTAuthMiddleware(
             URLRouter(
                 websocket_routing.websocket_urlpatterns

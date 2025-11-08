@@ -259,7 +259,8 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration for Desktop App
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8080').split(',')
+# Include file:// and app:// for desktop/mobile apps
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:8080').split(',') + ['file://', 'app://']
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',
