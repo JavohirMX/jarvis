@@ -174,8 +174,8 @@ class GeminiProvider(BaseAIProvider):
                 'config': config,
             }
             
-            if system_instruction:
-                generate_params['system_instruction'] = system_instruction
+            # if system_instruction:
+            #     generate_params['system_instruction'] = system_instruction
             
             response_stream = self.client.models.generate_content_stream(**generate_params)
             
