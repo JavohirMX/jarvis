@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
+from django.conf import settings
+from django.core.files.storage import default_storage
 from .models import UserProfile
 from .serializers import UserProfileSerializer, UsageStatisticsSerializer
 
@@ -43,6 +45,33 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Return the profile for the currently authenticated user"""
         return self.request.user.profile
+    
+    def update(self, request, *args, **kwargs):
+        """Override update to ensure avatar is saved to MinIO"""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        
+        # If avatar is being updated, ensure bucket exists if using MinIO
+        if 'avatar' in request.FILES and getattr(settings, 'USE_MINIO', False):
+            try:
+                from config.minio_service import get_minio_service
+                minio_service = get_minio_service()
+                bucket_name = getattr(settings, 'MINIO_BUCKET_NAME', 'jarvis-media')
+                minio_service.ensure_bucket_exists(bucket_name)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Could not ensure MinIO bucket exists: {e}")
+                # Continue anyway - storage might still work
+        
+        self.perform_update(serializer)
+        
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        
+        return Response(serializer.data)
 
 
 @extend_schema(

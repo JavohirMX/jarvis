@@ -42,6 +42,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     
     # Profile information
+    # Note: ImageField automatically uses STORAGES['default'] which is MinIO when USE_MINIO=True
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     
     # Theme preferences

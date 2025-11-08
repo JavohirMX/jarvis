@@ -682,7 +682,21 @@ class UploadChatImageView(APIView):
         
         try:
             from django.core.files.storage import default_storage
+            from django.conf import settings
             import uuid
+            
+            # Ensure bucket exists if using MinIO
+            if getattr(settings, 'USE_MINIO', False):
+                try:
+                    from config.minio_service import get_minio_service
+                    minio_service = get_minio_service()
+                    bucket_name = getattr(settings, 'MINIO_BUCKET_NAME', 'jarvis-media')
+                    minio_service.ensure_bucket_exists(bucket_name)
+                except Exception as storage_error:
+                    # Log but don't fail - storage might still work
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"Could not ensure MinIO bucket exists: {storage_error}")
             
             # Generate unique filename
             ext = image_file.name.split('.')[-1] if '.' in image_file.name else 'jpg'
@@ -692,6 +706,12 @@ class UploadChatImageView(APIView):
             saved_path = default_storage.save(filename, image_file)
             image_url = default_storage.url(saved_path)
             
+            # Ensure URL is absolute if using MinIO
+            if getattr(settings, 'USE_MINIO', False) and not image_url.startswith('http'):
+                minio_endpoint = getattr(settings, 'MINIO_ENDPOINT', 'http://localhost:9000')
+                bucket_name = getattr(settings, 'MINIO_BUCKET_NAME', 'jarvis-media')
+                image_url = f"{minio_endpoint}/{bucket_name}/{saved_path}"
+            
             return Response({
                 'image_url': image_url,
                 'filename': saved_path,
@@ -700,6 +720,9 @@ class UploadChatImageView(APIView):
             })
             
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Image upload failed: {str(e)}", exc_info=True)
             return Response(
                 {'error': f'Upload failed: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
