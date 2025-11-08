@@ -75,3 +75,5 @@ celerybeat.pid
 # Backup files
 *.bak
 
+# Auto-generated OpenAPI schema
+schema.yml
