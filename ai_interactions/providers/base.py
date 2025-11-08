@@ -12,6 +12,8 @@ class AIMessage:
     """Unified message format across all providers"""
     role: str  # 'system', 'user', 'assistant'
     content: str
+    image_data: Optional[bytes] = None  # Image data for multimodal requests
+    image_mime_type: Optional[str] = None  # MIME type (e.g., 'image/jpeg', 'image/png')
 
 
 @dataclass

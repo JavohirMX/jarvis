@@ -3,6 +3,7 @@ Models for AI interactions, conversations, messages, and memory
 """
 from django.db import models
 from django.contrib.auth.models import User
+from config.storages import MinIOChatMediaStorage
 
 
 class Conversation(models.Model):
@@ -47,6 +48,17 @@ class AIMessage(models.Model):
     content = models.TextField()
     context_data = models.JSONField(default=dict, blank=True)
     ai_model_used = models.CharField(max_length=100)
+    
+    # Image support for multimodal interactions
+    image = models.ImageField(
+        upload_to='chat_images/',
+        storage=MinIOChatMediaStorage(),
+        null=True,
+        blank=True
+    )
+    image_url = models.URLField(max_length=500, null=True, blank=True)
+    image_mime_type = models.CharField(max_length=50, null=True, blank=True)
+    image_size = models.IntegerField(null=True, blank=True, help_text="Image file size in bytes")
     
     # Token tracking
     prompt_tokens = models.IntegerField(default=0)

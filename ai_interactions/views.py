@@ -90,14 +90,39 @@ class AIMemoryView(generics.RetrieveAPIView):
 
 
 @extend_schema(
-    request=inline_serializer(
-        name='ChatRequest',
-        fields={
-            'message': serializers.CharField(),
-            'conversation_id': serializers.IntegerField(required=False),
-            'context': serializers.JSONField(required=False),
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'message': {
+                    'type': 'string',
+                    'description': 'The message text to send to AI'
+                },
+                'conversation_id': {
+                    'type': 'integer',
+                    'description': 'Optional conversation ID. Creates new conversation if not provided',
+                    'nullable': True
+                },
+                'context': {
+                    'type': 'object',
+                    'description': 'Optional context data (clipboard, active_app, etc.)',
+                    'nullable': True
+                },
+                'provider': {
+                    'type': 'string',
+                    'description': 'Optional AI provider selection (openai, anthropic, gemini)',
+                    'nullable': True
+                },
+                'image': {
+                    'type': 'string',
+                    'format': 'binary',
+                    'description': 'Optional image file (PNG, JPEG, WEBP, HEIC, HEIF). Max size: 50MB',
+                    'nullable': True
+                }
+            },
+            'required': ['message']
         }
-    ),
+    },
     responses={
         200: inline_serializer(
             name='ChatResponse',
@@ -110,8 +135,21 @@ class AIMemoryView(generics.RetrieveAPIView):
             }
         )
     },
-    summary="Send message to AI",
-    description="Send a message to AI and get a response. Creates a new conversation if conversation_id is not provided."
+    summary="Send message to AI (with optional image)",
+    description="""
+    Send a message to AI and get a response. Supports multimodal requests with images.
+    
+    **Image Support (Gemini only for now):**
+    - Supported formats: PNG, JPEG, WEBP, HEIC, HEIF
+    - Maximum file size: 50MB
+    - Images are stored in MinIO and included in conversation history
+    - Token cost includes image processing (based on image dimensions)
+    
+    **Request Format:**
+    Use `multipart/form-data` when including an image, otherwise standard JSON.
+    
+    Creates a new conversation if conversation_id is not provided.
+    """
 )
 class AIChatView(APIView):
     """
@@ -136,6 +174,45 @@ class AIChatView(APIView):
         message_text = request.data.get('message', '').strip()
         conversation_id = request.data.get('conversation_id')
         context = request.data.get('context', {})
+        
+        # Handle image upload (optional)
+        image_file = request.FILES.get('image')
+        image_data = None
+        image_mime_type = None
+        image_size = None
+        saved_image = None
+        
+        if image_file:
+            # Validate MIME type
+            allowed_mime_types = [
+                'image/png', 'image/jpeg', 'image/jpg',
+                'image/webp', 'image/heic', 'image/heif'
+            ]
+            
+            # Get MIME type from file
+            content_type = image_file.content_type
+            if content_type not in allowed_mime_types:
+                return Response(
+                    {'error': f'Invalid image format. Allowed formats: PNG, JPEG, WEBP, HEIC, HEIF'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Check file size (Gemini supports up to 20MB for inline, larger for File API)
+            # We'll set a reasonable limit of 50MB
+            max_size = 50 * 1024 * 1024  # 50MB
+            if image_file.size > max_size:
+                return Response(
+                    {'error': f'Image too large. Maximum size: 50MB'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Read image data for processing
+            image_data = image_file.read()
+            image_mime_type = content_type
+            image_size = image_file.size
+            
+            # Reset file pointer for saving
+            image_file.seek(0)
         
         if not message_text:
             return Response(
@@ -165,8 +242,8 @@ class AIChatView(APIView):
             title = message_text[:50] + ('...' if len(message_text) > 50 else '')
             conversation = Conversation.objects.create(user=user, title=title)
         
-        # Save user message to database
-        AIMessage.objects.create(
+        # Save user message to database (with optional image)
+        user_message = AIMessage(
             conversation=conversation,
             role='user',
             content=message_text,
@@ -176,6 +253,19 @@ class AIChatView(APIView):
             completion_tokens=0,
             total_tokens=0
         )
+        
+        # Save image if provided
+        if image_file:
+            user_message.image = image_file
+            user_message.image_mime_type = image_mime_type
+            user_message.image_size = image_size
+        
+        user_message.save()
+        
+        # Get image URL after saving (MinIO will generate the URL)
+        if image_file and user_message.image:
+            user_message.image_url = user_message.image.url
+            user_message.save(update_fields=['image_url'])
         
         # Get conversation history for context
         conversation_history = []
@@ -190,7 +280,8 @@ class AIChatView(APIView):
         # Call AI API (supports OpenAI, Anthropic, Gemini)
         try:
             ai_response_text, prompt_tokens, completion_tokens, total_tokens = self._get_ai_response(
-                message_text, context, user, conversation_history
+                message_text, context, user, conversation_history,
+                image_data, image_mime_type
             )
         except Exception as e:
             return Response(
@@ -249,7 +340,15 @@ class AIChatView(APIView):
             }
         })
     
-    def _get_ai_response(self, message: str, context: dict, user, conversation_history: list = None) -> tuple:
+    def _get_ai_response(
+        self, 
+        message: str, 
+        context: dict, 
+        user, 
+        conversation_history: list = None,
+        image_data: bytes = None,
+        image_mime_type: str = None
+    ) -> tuple:
         """
         Get AI response using the service layer
         Supports multiple providers (OpenAI, Anthropic, Gemini)
@@ -266,13 +365,15 @@ class AIChatView(APIView):
             # Initialize AI service
             ai_service = AIService(user=user, provider=provider)
             
-            # Get AI response
+            # Get AI response (with optional image)
             response = ai_service.chat(
                 message=message,
                 context=context,
                 conversation_history=conversation_history,
                 temperature=0.7,
-                max_tokens=None  # Use provider default
+                max_tokens=None,  # Use provider default
+                image_data=image_data,
+                image_mime_type=image_mime_type
             )
             
             return (

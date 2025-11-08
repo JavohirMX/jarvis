@@ -27,6 +27,9 @@ from drf_spectacular.views import (
 urlpatterns = [
     path('admin/', admin.site.urls),
     
+    # Landing page
+    path('', include('landing.urls')),
+    
     # API endpoints
     path('api/auth/', include('authentication.urls')),
     path('api/profile/', include('profiles.urls')),

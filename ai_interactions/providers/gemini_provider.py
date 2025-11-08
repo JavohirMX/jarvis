@@ -51,8 +51,9 @@ class GeminiProvider(BaseAIProvider):
         **kwargs
     ) -> AIResponse:
         """
-        Send chat request to Gemini
+        Send chat request to Gemini (supports text and images)
         Reference: https://ai.google.dev/gemini-api/docs/text-generation
+        Image support: https://ai.google.dev/gemini-api/docs/image-understanding
         """
         try:
             # Convert messages to Gemini format
@@ -66,9 +67,52 @@ class GeminiProvider(BaseAIProvider):
                 else:
                     # Convert role: 'assistant' -> 'model' for Gemini
                     role = 'model' if msg.role == 'assistant' else msg.role
+                    
+                    # Build parts for this message (text + optional image)
+                    parts = []
+                    
+                    # Add image first if present (Gemini best practice)
+                    if msg.image_data and msg.image_mime_type:
+                        # Determine upload strategy based on file size
+                        image_size = len(msg.image_data)
+                        
+                        # Use inline data for files < 20MB, File API for larger files
+                        if image_size < 20 * 1024 * 1024:  # 20MB threshold
+                            # Inline base64 approach
+                            parts.append(types.Part.from_bytes(
+                                data=msg.image_data,
+                                mime_type=msg.image_mime_type
+                            ))
+                        else:
+                            # For large files, use File API
+                            # Note: This requires uploading the file first
+                            import tempfile
+                            import os
+                            
+                            # Create temporary file
+                            with tempfile.NamedTemporaryFile(delete=False, suffix='.img') as tmp_file:
+                                tmp_file.write(msg.image_data)
+                                tmp_path = tmp_file.name
+                            
+                            try:
+                                # Upload file to Gemini
+                                uploaded_file = self.client.files.upload(path=tmp_path)
+                                # Use uploaded file reference
+                                parts.append(types.Part.from_uri(
+                                    file_uri=uploaded_file.uri,
+                                    mime_type=msg.image_mime_type
+                                ))
+                            finally:
+                                # Clean up temp file
+                                if os.path.exists(tmp_path):
+                                    os.unlink(tmp_path)
+                    
+                    # Add text content
+                    parts.append({'text': msg.content})
+                    
                     contents.append({
                         'role': role,
-                        'parts': [{'text': msg.content}]
+                        'parts': parts
                     })
             
             # Build generation config
@@ -134,7 +178,7 @@ class GeminiProvider(BaseAIProvider):
         **kwargs
     ) -> Generator[str, None, None]:
         """
-        Stream chat response from Gemini
+        Stream chat response from Gemini (supports text and images)
         Reference: https://ai.google.dev/gemini-api/docs/text-generation#stream-response
         """
         try:
@@ -147,9 +191,24 @@ class GeminiProvider(BaseAIProvider):
                     system_instruction = msg.content
                 else:
                     role = 'model' if msg.role == 'assistant' else msg.role
+                    
+                    # Build parts for this message (text + optional image)
+                    parts = []
+                    
+                    # Add image first if present
+                    if msg.image_data and msg.image_mime_type:
+                        # For streaming, use inline data only (simpler, faster)
+                        parts.append(types.Part.from_bytes(
+                            data=msg.image_data,
+                            mime_type=msg.image_mime_type
+                        ))
+                    
+                    # Add text content
+                    parts.append({'text': msg.content})
+                    
                     contents.append({
                         'role': role,
-                        'parts': [{'text': msg.content}]
+                        'parts': parts
                     })
             
             # Build generation config

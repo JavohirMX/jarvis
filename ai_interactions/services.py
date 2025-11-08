@@ -39,7 +39,9 @@ class AIService:
         context: Optional[Dict] = None,
         conversation_history: Optional[List[Dict]] = None,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None
+        max_tokens: Optional[int] = None,
+        image_data: Optional[bytes] = None,
+        image_mime_type: Optional[str] = None
     ) -> AIResponse:
         """
         Send a chat message and get AI response
@@ -50,11 +52,16 @@ class AIService:
             conversation_history: Previous messages in conversation
             temperature: Sampling temperature
             max_tokens: Maximum tokens in response
+            image_data: Optional image data for multimodal requests
+            image_mime_type: MIME type of the image (e.g., 'image/jpeg')
             
         Returns:
             AIResponse with content and token usage
         """
-        messages = self._build_messages(message, context, conversation_history)
+        messages = self._build_messages(
+            message, context, conversation_history, 
+            image_data, image_mime_type
+        )
         return self.provider.chat(
             messages=messages,
             temperature=temperature,
@@ -67,7 +74,9 @@ class AIService:
         context: Optional[Dict] = None,
         conversation_history: Optional[List[Dict]] = None,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None
+        max_tokens: Optional[int] = None,
+        image_data: Optional[bytes] = None,
+        image_mime_type: Optional[str] = None
     ) -> Generator[str, None, None]:
         """
         Stream chat response in real-time
@@ -78,11 +87,16 @@ class AIService:
             conversation_history: Previous messages
             temperature: Sampling temperature
             max_tokens: Maximum tokens in response
+            image_data: Optional image data for multimodal requests
+            image_mime_type: MIME type of the image
             
         Yields:
             Response chunks as they arrive
         """
-        messages = self._build_messages(message, context, conversation_history)
+        messages = self._build_messages(
+            message, context, conversation_history,
+            image_data, image_mime_type
+        )
         yield from self.provider.stream_chat(
             messages=messages,
             temperature=temperature,
@@ -187,7 +201,9 @@ class AIService:
         self,
         user_message: str,
         context: Optional[Dict] = None,
-        conversation_history: Optional[List[Dict]] = None
+        conversation_history: Optional[List[Dict]] = None,
+        image_data: Optional[bytes] = None,
+        image_mime_type: Optional[str] = None
     ) -> List[ProviderMessage]:
         """
         Build message list with system prompt, history, and context
@@ -196,6 +212,8 @@ class AIService:
             user_message: Current user message
             context: Optional context dictionary
             conversation_history: Previous messages
+            image_data: Optional image data for current message
+            image_mime_type: MIME type of the image
             
         Returns:
             List of ProviderMessage objects
@@ -206,7 +224,7 @@ class AIService:
         system_content = self._build_system_prompt(context)
         messages.append(ProviderMessage(role='system', content=system_content))
         
-        # Add conversation history
+        # Add conversation history (without re-sending old images)
         if conversation_history:
             for msg in conversation_history[-10:]:  # Last 10 messages for context
                 messages.append(ProviderMessage(
@@ -214,8 +232,13 @@ class AIService:
                     content=msg['content']
                 ))
         
-        # Add current message
-        messages.append(ProviderMessage(role='user', content=user_message))
+        # Add current message (with optional image)
+        messages.append(ProviderMessage(
+            role='user',
+            content=user_message,
+            image_data=image_data,
+            image_mime_type=image_mime_type
+        ))
         
         return messages
     

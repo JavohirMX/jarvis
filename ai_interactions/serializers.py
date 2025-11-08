@@ -12,8 +12,10 @@ class AIMessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = AIMessage
         fields = ('id', 'role', 'content', 'context_data', 'ai_model_used',
-                  'prompt_tokens', 'completion_tokens', 'total_tokens', 'created_at')
-        read_only_fields = ('id', 'created_at')
+                  'prompt_tokens', 'completion_tokens', 'total_tokens', 
+                  'image_url', 'image_mime_type', 'image_size',
+                  'created_at')
+        read_only_fields = ('id', 'image_url', 'image_mime_type', 'image_size', 'created_at')
 
 
 class ConversationSerializer(serializers.ModelSerializer):
