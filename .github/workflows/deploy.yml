@@ -49,9 +49,9 @@ jobs:
             echo "🛑 Stopping containers..."
             docker-compose down || true
             
-            # Build new images
+            # Build new image (only once for all services)
             echo "🏗️ Building Docker images..."
-            docker-compose build --no-cache web
+            docker-compose build web
             
             # Start containers
             echo "🚢 Starting containers..."

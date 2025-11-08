@@ -65,6 +65,7 @@ services:
 
   # Django Application with Daphne (ASGI)
   web:
+    image: jarvis_app:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -147,9 +148,7 @@ services:
 
   # Celery Worker
   celery_worker:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: jarvis_app:latest
     container_name: jarvis_celery_worker
     restart: unless-stopped
     command: celery -A config worker -l info
@@ -198,9 +197,7 @@ services:
 
   # Celery Beat Scheduler
   celery_beat:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: jarvis_app:latest
     container_name: jarvis_celery_beat
     restart: unless-stopped
     command: celery -A config beat -l info

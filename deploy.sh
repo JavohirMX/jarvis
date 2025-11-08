@@ -54,9 +54,9 @@ chmod +x deploy.sh
 print_message "$BLUE" "🛑 Stopping existing containers..."
 docker-compose down || true
 
-# Build Docker images
+# Build Docker images (only web service, others will reuse the image)
 print_message "$BLUE" "🏗️  Building Docker images..."
-docker-compose build --no-cache
+docker-compose build web
 
 # Start containers
 print_message "$BLUE" "🚢 Starting containers..."
