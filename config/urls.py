@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files (avatars, chat images, etc.)
+# In production, configure nginx to serve /media/ from MEDIA_ROOT
+# For development and simple deployments, Django can serve them directly
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

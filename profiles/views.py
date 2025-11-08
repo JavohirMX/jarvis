@@ -7,8 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiExample
 from django.conf import settings
-from django.core.files.storage import default_storage
-from .models import UserProfile
 from .serializers import UserProfileSerializer, UsageStatisticsSerializer
 
 
@@ -47,13 +45,13 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
         return self.request.user.profile
     
     def update(self, request, *args, **kwargs):
-        """Override update to ensure avatar is saved to MinIO"""
+        """Override update to handle avatar uploads"""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         
-        # If avatar is being updated, ensure bucket exists if using MinIO
+        # If using MinIO, ensure bucket exists before saving
         if 'avatar' in request.FILES and getattr(settings, 'USE_MINIO', False):
             try:
                 from config.minio_service import get_minio_service

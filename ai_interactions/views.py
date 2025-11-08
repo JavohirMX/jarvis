@@ -702,15 +702,18 @@ class UploadChatImageView(APIView):
             ext = image_file.name.split('.')[-1] if '.' in image_file.name else 'jpg'
             filename = f"chat_images/user_{request.user.id}/{uuid.uuid4()}.{ext}"
             
-            # Save to storage (MinIO or local)
+            # Save to storage (local file system by default, or MinIO if enabled)
             saved_path = default_storage.save(filename, image_file)
             image_url = default_storage.url(saved_path)
             
-            # Ensure URL is absolute if using MinIO
-            if getattr(settings, 'USE_MINIO', False) and not image_url.startswith('http'):
-                minio_endpoint = getattr(settings, 'MINIO_ENDPOINT', 'http://localhost:9000')
-                bucket_name = getattr(settings, 'MINIO_BUCKET_NAME', 'jarvis-media')
-                image_url = f"{minio_endpoint}/{bucket_name}/{saved_path}"
+            # For local storage, ensure URL is relative and can be served by Django
+            # For MinIO, the storage backend handles absolute URLs
+            if not getattr(settings, 'USE_MINIO', False):
+                # Local storage - URL should be relative like /media/chat_images/...
+                # Django will serve it via MEDIA_URL
+                if not image_url.startswith('/'):
+                    # Make it relative if it's not already
+                    image_url = f"/media/{saved_path}"
             
             return Response({
                 'image_url': image_url,
