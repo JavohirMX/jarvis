@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
@@ -25,11 +26,20 @@ load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-)u%5nm6x8km6rdfk(xk^d!_-!$p3@jh#+l0c_!)xw5iwiosr21')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
+
+# SECURITY WARNING: keep the secret key used in production secret!
+# The built-in key is only for local development and the test runner. Without
+# SECRET_KEY and with DEBUG off, startup fails instead of signing tokens with a
+# key that is public in the repository.
+SECRET_KEY = os.getenv('SECRET_KEY', '')
+if not SECRET_KEY:
+    if DEBUG or 'test' in sys.argv[1:2]:
+        SECRET_KEY = 'django-insecure-dev-only-key-not-for-production'
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured('SECRET_KEY is not set. Set it in the environment (or DEBUG=True for local development).')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
@@ -241,6 +251,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Login and register are brute-force targets. Per client IP.
+    'DEFAULT_THROTTLE_RATES': {
+        'auth': os.getenv('AUTH_THROTTLE_RATE', '20/min'),
+    },
 }
 
 # Simple JWT Configuration
