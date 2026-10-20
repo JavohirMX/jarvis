@@ -3,9 +3,11 @@ from rest_framework import generics, status, serializers as drf_serializers
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.request import Request
+from rest_framework.throttling import ScopedRateThrottle
 from django.contrib.auth.models import User
 from drf_spectacular.utils import extend_schema, inline_serializer
 
@@ -19,6 +21,8 @@ class RegisterView(generics.CreateAPIView):
     """
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = 'auth'
     serializer_class = RegisterSerializer
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -64,6 +68,8 @@ class LoginView(TokenObtainPairView):
     Authenticates with email and password instead of username
     """
     permission_classes = (AllowAny,)
+    throttle_classes = (ScopedRateThrottle,)
+    throttle_scope = 'auth'
     serializer_class = EmailTokenObtainPairSerializer
 
 
@@ -105,9 +111,9 @@ class LogoutView(APIView):
                 {"message": "Logout successful"},
                 status=status.HTTP_200_OK
             )
-        except Exception as e:
+        except TokenError:
             return Response(
-                {"error": str(e)},
+                {"error": "Invalid or expired refresh token"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

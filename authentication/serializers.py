@@ -10,7 +10,11 @@ class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
     email = serializers.EmailField(
         required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            lookup='iexact',
+            message='A user with this email already exists.',
+        )]
     )
     password = serializers.CharField(
         write_only=True,
@@ -55,21 +59,17 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not email or not password:
             raise serializers.ValidationError('Email and password are required.')
         
-        # Find user by email
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('No user found with this email address.')
-        
-        # Authenticate using username (since Django's authenticate requires username)
-        user = authenticate(username=user.username, password=password)
-        
-        if user is None:
-            raise serializers.ValidationError('Invalid email or password.')
-        
-        if not user.is_active:
-            raise serializers.ValidationError('User account is disabled.')
-        
+        # One message for every failure, so the endpoint does not reveal which
+        # emails have accounts. Email match ignores case.
+        invalid = serializers.ValidationError('Invalid email or password.')
+        user = None
+        for candidate in User.objects.filter(email__iexact=email.strip()):
+            user = authenticate(username=candidate.username, password=password)
+            if user is not None:
+                break
+        if user is None or not user.is_active:
+            raise invalid
+
         # Generate tokens
         refresh = self.get_token(user)
         
